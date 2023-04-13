@@ -12,6 +12,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // API URL
 let queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson"
 
+
+///// Using Leaflet, create a map that plots all the earthquakes from your dataset based on their longitude and latitude. /////
+
+// function to determine color based on depth
 function chooseColor(depth) {
     if (depth >= 90) return "red";
     else if (depth >= 70) return "darkorange";
@@ -19,37 +23,23 @@ function chooseColor(depth) {
     else if (depth >= 30) return "yellow";
     else if (depth >= 10) return "lime";
     else return "green";
-  }
+  };
 
-// Use the URL of this JSON to pull in the data for the visualization.
-// d3.json(queryUrl).then(function(response) {
-//     console.log(response);
-//     L.geoJson(response, {
-//             style: function(feature) {
-//                 return{
-//                     color: "white",
-//                     fillColor: chooseColor(feature.geometry.coordinates[2]),
-//                     fillOpacity: 0.5,
-//                     weight: 1.5
-
-//                 };
-//         },
-
-//         onEachFeature: function(feature, layer) {
-//             layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
-//             return L.circle([feature.geometry.coordinates[1],feature.geometry.coordinates[0]],{radius: feature.properties.mag});
-//         }
-//     }).addTo(myMap);
-// });
-
-
-////// TEST ///////
+// Select data using D3.
 d3.json(queryUrl).then(function(response) {
+
+    // log response
     console.log(response);
+
+    // use geoJson to plot points
     L.geoJson(response, {
+
+        // create circles instead of markers
         pointToLayer: (feature,latlng) => {
             return new L.circle([feature.geometry.coordinates[1],feature.geometry.coordinates[0]], feature.properties.mag*10000);
         },
+
+        // adding style and calling chooseColor function
         style: function(feature) {
             return{
                 color: "black",
@@ -59,6 +49,7 @@ d3.json(queryUrl).then(function(response) {
                 };
         },
 
+        // binding popUp
         onEachFeature: function(feature, layer) {
             layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
             
@@ -88,48 +79,4 @@ d3.json(queryUrl).then(function(response) {
 
 
 
-//////// TEST ///////
-// d3.json(queryUrl).then(function(response) {
-//     console.log(response);
-//     createFeatures(response.features);
-// });
 
-// function createFeatures(earthquakeData) {
-//     function onEachFeature(feature,layer) {
-//         layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
-//     }
-
-//     let earthquakes = L.geoJson(earthquakeData, {
-//         onEachFeature: onEachFeature
-//     });
-
-//     createMap(earthquakes);
-// }
-
-// function createMap(earthquakes) {
-//     let myMap = L.map("map", {
-//         center: [37.0902, -95.7129],
-//         zoom: 5,
-//         layers: street
-//     });
-    
-//     let overlayMaps = {
-//         Earthquakes: earthquakes
-//     };
-
-// }
-
-
-
-
-// Using Leaflet, create a map that plots all the earthquakes from your dataset based on their longitude and latitude.
-
-    // Your data markers should reflect the magnitude of the earthquake by their size and 
-    // the depth of the earthquake by color. Earthquakes with higher magnitudes should appear larger, 
-    // and earthquakes with greater depth should appear darker in color.
-
-    // Hint: The depth of the earth can be found as the third coordinate for each earthquake.
-
-    // Include popups that provide additional information about the earthquake when its associated marker is clicked.
-
-    // Create a legend that will provide context for your map data.
